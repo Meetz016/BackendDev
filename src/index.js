@@ -12,7 +12,7 @@ connectDB()
         console.log("OOPS ! something went wrong:",error)
     })
     app.listen(process.env.PORT || 8000,()=>{
-        console.log("server started !!! at:",process.env.PORT)
+        console.log("server started at:",process.env.PORT)
     })
 
 
