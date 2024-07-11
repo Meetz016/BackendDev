@@ -4,20 +4,7 @@ import { User } from "../models/user.model.js";
 import {uploader} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js";
 const registerUser=asyncHandler( async(req,res)=>{
-  //get user data ✅
-  //validation-not empty,email validation ✅
-  //check if user is already exist or not: username,email ✅
-  //avatar present or not(image)✅
-  //upload to cloudinary,avatar ✅
-  
-  //create user object-create db entry✅
-  //remove password and refresh token field
-  //response is there or not(i.e user is created or not)
-  //done
-
   const {username,email,fullname,password}=req.body
-  console.log(email);
-
   if ([username, email, fullname, password].some((data) => data?.trim() === "")) {
     throw new ApiError(400, "All fields must not be empty");
   }
@@ -35,7 +22,7 @@ const registerUser=asyncHandler( async(req,res)=>{
 
 
     if(!avatarLocalPath){
-        throw new ApiError(400,"avatar is required")
+        throw new ApiError(400,"avatar is required local")
     }
 
     const avatar=await uploader(avatarLocalPath)
@@ -53,7 +40,7 @@ const registerUser=asyncHandler( async(req,res)=>{
         password
     })
 
-
+    //used when you dont wanna send any private info in the response just use -field_name 
     const createdUser=await User.find(user._id).select(
         "-password -refreshToken"
     )

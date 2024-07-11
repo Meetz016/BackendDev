@@ -1,6 +1,7 @@
 import {v2 as cloudinary} from "cloudinary";
+import dotenv from 'dotenv'
 import fs from "fs";
-
+dotenv.config()
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_NAME, 
     api_key: process.env.CLOUDINARY_API_KEY, 
@@ -20,8 +21,8 @@ const uploader= async(localFilePath)=>{
             resource_type:"auto"
         })
         //if control reached here means file has been sucessfully uploaded.
-        console.log("file has been uploaded successfully.",response.url);
-
+        fs.unlinkSync(localFilePath);
+        
         return response;
     }catch(error){
 
