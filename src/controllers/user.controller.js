@@ -74,7 +74,6 @@ const registerUser=asyncHandler( async(req,res)=>{
     )
 
 } )
-
 const loginUser=asyncHandler(async(req,res)=>{
 
     //username and password take and input
@@ -148,8 +147,6 @@ const logoutUser=asyncHandler(async(req,res)=>{
         new ApiResponse(200,{},"User is now logged Out...")
     )
 })
-
-
 const refreshAccessToken=asyncHandler(async(req,res)=>{
 
     const incomingAccessToken=req.cookie.refreshToken || req.body?.refreshToken;

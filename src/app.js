@@ -19,7 +19,7 @@ app.use(cookieParser())
 
 //for routing standard practice is to use import here
 import userRoute from "./routes/user.routes.js"
-
+import foodRoute from "./routes/food.routes.js"
 app.use("/api/v1/user",userRoute)
-
+app.use("/api/v2",foodRoute)
 export {app}
