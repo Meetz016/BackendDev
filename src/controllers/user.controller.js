@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import dotenv from "dotenv"
 import {uploader} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js";
+import jwt from 'jsonwebtoken';
 dotenv.config()
 
 // mongoDb provides user._id
@@ -123,8 +124,6 @@ const loginUser=asyncHandler(async(req,res)=>{
     )
 
 })
-
-
 const logoutUser=asyncHandler(async(req,res)=>{
     await User.findByIdAndUpdate(
         req.user._id,
@@ -149,4 +148,57 @@ const logoutUser=asyncHandler(async(req,res)=>{
         new ApiResponse(200,{},"User is now logged Out...")
     )
 })
-export {registerUser,loginUser,logoutUser}
+
+
+const refreshAccessToken=asyncHandler(async(req,res)=>{
+
+    const incomingAccessToken=req.cookie.refreshToken || req.body?.refreshToken;
+
+    if(!incomingAccessToken){
+        throw new ApiError(401,"Invalid request");
+    }
+
+    try {
+        const decodedToken=jwt.verify(incomingAccessToken,process.env.REFRESH_TOKEN_SECRET);
+    
+        if(!decodedToken){
+            throw new ApiError(400,"Invalid Refresh Token is Provided.")
+        }
+    
+        const user=await User.findById(decodedToken._id)
+    
+        if(!user){
+            throw new ApiError(402,"refresh token is invalid.")
+        }
+    
+        if(incomingAccessToken !==user?.refreshToken){
+            throw new ApiError(402,"refresh token is already used.")
+        }
+    
+        const {accessToken,newRefreshToken}=await generateAccessAndRefreshTokens(user._id)
+    
+        const options={
+            httpOnly:true,
+            secure:true
+        }
+    
+        res
+        .status(200)
+        .cookie("accessToken",accessToken,options)
+        .cookie("refreshToken",newRefreshToken,options)
+        .json(
+            new ApiResponse(
+                200,
+                {accessToken,refreshToken:newRefreshToken},
+                "Refresh Token Updated Suceessfully"
+    
+            )
+        )
+    } catch (error) {
+        throw new ApiError(
+            400,
+            error?.message || "Invalid AccessToken"
+        )
+    }
+})
+export {registerUser,loginUser,logoutUser,refreshAccessToken}
